@@ -1,18 +1,25 @@
 Attribute VB_Name = "mdlMain"
-'============================================================================
-'mdlMain
-'
-'客単価シートを新規作成し、メインシートの値を元に客単価を計算する。
-'============================================================================
 Option Explicit
+' ============================================================================
+' mdlMain
+'
+' 客単価シートを新規作成し、メインシートの値を元に客単価を計算する。
+' ============================================================================
 
-Private Sub startButton_Click()
+' ----------------------------------------------------------------------------
+' ◆ StartButtonClick
+'
+' メインシート start ボタンクリックで呼び出し。
+' ----------------------------------------------------------------------------
+Public Sub StartButtonClick()
     meDeleteSeet
     meGetAverageMain
 End Sub
 
 ' ----------------------------------------------------------------------------
-'客単価を計算する。
+' meGetAverageMain
+'
+' 客単価を計算する。
 ' ----------------------------------------------------------------------------
 Private Sub meGetAverageMain()
     Dim i As Long
@@ -21,13 +28,13 @@ Private Sub meGetAverageMain()
     Dim ws2 As Worksheet
     Dim maxRow As Long
     
-    Set ws = Worksheets(GWsMain)
+    Set ws = ThisWorkbook.Worksheets(1)
     
     maxRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
     
-    setResultSheet
+    meSetResultSheet
 
-    Set ws2 = Worksheets(GWsAverage)
+    Set ws2 = ThisWorkbook.Worksheets(2)
     
     With ws2
         For i = 2 To maxRow
@@ -41,10 +48,14 @@ Private Sub meGetAverageMain()
     Worksheets(GWsAverage).Range("A1").CurrentRegion.Borders.LineStyle = xlContinuous
 
     meGetAverage ws2, maxRow
+    
+    Set ws = Nothing
 End Sub
 
 ' ----------------------------------------------------------------------------
-'客単価 = 売上 ÷ 客数。
+' meGetAverage
+'
+' 客単価 = 売上 ÷ 客数。
 ' ----------------------------------------------------------------------------
 Private Sub meGetAverage(ws As Worksheet, maxRow As Long)
     Dim i As Long
@@ -58,7 +69,9 @@ Private Sub meGetAverage(ws As Worksheet, maxRow As Long)
 End Sub
 
 ' ----------------------------------------------------------------------------
-'メインシート以外を消去する。
+' meDeleteSeet
+'
+' メインシート以外を消去する。
 ' ----------------------------------------------------------------------------
 Private Sub meDeleteSeet()
     Dim ws As Worksheet
@@ -73,12 +86,16 @@ Private Sub meDeleteSeet()
 End Sub
 
 ' ----------------------------------------------------------------------------
-'客単価シートを追加する。
+' meSetResultSheet
+'
+' 客単価シートを追加する。
 ' ----------------------------------------------------------------------------
-Private Sub setResultSheet()
+Private Sub meSetResultSheet()
     Dim ws As Worksheet
     
-    Set ws = Worksheets.Add(After:=Sheets(Worksheets.Count))
+    Worksheets.Add after:=Worksheets(Worksheets.Count)
+    
+    Set ws = ThisWorkbook.Worksheets(2)
 
     With ws
         .Name = GWsAverage
@@ -87,4 +104,6 @@ Private Sub setResultSheet()
         .Range("C1").Value = "客数"
         .Range("D1").Value = "客単価"
     End With
+    
+    Set ws = Nothing
 End Sub
