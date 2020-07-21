@@ -12,73 +12,73 @@ Option Explicit
 ' メインシート start ボタンクリックで呼び出し。
 ' ----------------------------------------------------------------------------
 Public Sub StartButtonClick()
-    meDeleteSeet
-    meGetAverageMain
+    meメインシート以外を削除する
+    me客単価を計算する
 End Sub
 
 ' ----------------------------------------------------------------------------
-' meGetAverageMain
+' me客単価を計算する
 '
 ' 客単価を計算する。
 ' ----------------------------------------------------------------------------
-Private Sub meGetAverageMain()
+Private Sub me客単価を計算する()
     Dim i As Long
     Dim j As Long
     Dim ws As Worksheet
     Dim ws2 As Worksheet
-    Dim maxRow As Long
+    Dim 最大行数 As Long
     
     Set ws = ThisWorkbook.Worksheets(1)
     
-    maxRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+    最大行数 = ws.Cells(Rows.Count, 1).End(xlUp).Row
     
-    meSetResultSheet
+    me客単価シートを追加する
 
     Set ws2 = ThisWorkbook.Worksheets(2)
     
     With ws2
-        For i = 2 To maxRow
-            For j = 1 To GAverageColumn
+        For i = 2 To 最大行数
+            For j = 1 To GC客単価
                 .Cells(i, j).Value = ws.Cells(i, j).Value
                 .Cells(i, j).EntireColumn.AutoFit
             Next
         Next
     End With
     
-    Worksheets(GWsAverage).Range("A1").CurrentRegion.Borders.LineStyle = xlContinuous
+    Worksheets(Gシート名客単価).Range("A1").CurrentRegion.Borders.LineStyle = xlContinuous
 
-    meGetAverage ws2, maxRow
+    me一つの客単価を計算する ws2, 最大行数
     
     Set ws = Nothing
 End Sub
 
 ' ----------------------------------------------------------------------------
-' meGetAverage
+' me一つの客単価を計算する
 '
 ' 客単価 = 売上 ÷ 客数。
 ' ----------------------------------------------------------------------------
-Private Sub meGetAverage(ws As Worksheet, maxRow As Long)
+Private Sub me一つの客単価を計算する(ws As Worksheet, 最大行数 As Long)
     Dim i As Long
     Dim j As Long
     
     With ws
-        For i = 2 To maxRow
-            .Cells(i, GAverageColumn).Value = .Cells(i, GSalseColimn) \ .Cells(i, GCustomerColumn)
+        For i = 2 To 最大行数
+            .Cells(i, GC客単価).Value = .Cells(i, GC売上) \ .Cells(i, GC客数)
         Next
     End With
 End Sub
 
 ' ----------------------------------------------------------------------------
-' meDeleteSeet
+' meメインシート以外を削除する
 '
 ' メインシート以外を消去する。
 ' ----------------------------------------------------------------------------
-Private Sub meDeleteSeet()
+Private Sub meメインシート以外を削除する()
     Dim ws As Worksheet
 
     Application.DisplayAlerts = False
     For Each ws In Worksheets
-        If ws.Name <> GWsMain Then
+        If ws.Name <> Gシート名メイン Then
             ws.Delete
         End If
     Next
@@ -86,11 +86,11 @@ Private Sub meDeleteSeet()
 End Sub
 
 ' ----------------------------------------------------------------------------
-' meSetResultSheet
+' me客単価シートを追加する
 '
 ' 客単価シートを追加する。
 ' ----------------------------------------------------------------------------
-Private Sub meSetResultSheet()
+Private Sub me客単価シートを追加する()
     Dim ws As Worksheet
     
     Worksheets.Add after:=Worksheets(Worksheets.Count)
@@ -98,7 +98,7 @@ Private Sub meSetResultSheet()
     Set ws = ThisWorkbook.Worksheets(2)
 
     With ws
-        .Name = GWsAverage
+        .Name = Gシート名客単価
         .Range("A1").Value = "日付"
         .Range("B1").Value = "売上  "
         .Range("C1").Value = "客数"
