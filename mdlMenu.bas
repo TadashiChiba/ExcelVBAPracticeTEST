@@ -11,7 +11,22 @@ Option Explicit
 '
 ' メインシート start ボタンクリックイベントを受け付ける。
 ' ----------------------------------------------------------------------------
-Public Sub bt客単価シートを作成する()
-    メインシート以外を削除する
-    客単価を計算する
+Public Sub bt客単価シート作成()
+    Dim Succeed As Boolean
+    Dim Message As String
+    
+    With Application
+        .Cursor = xlWait
+        .DisplayAlerts = False
+        .ScreenUpdating = False
+        Succeed = 客単価シートを作成する(ThisWorkbook, Message)
+        .Cursor = xlDefault
+        .DisplayAlerts = True
+        .ScreenUpdating = True
+    End With
+    If Not Succeed Then
+        MsgBox Message, vbExclamation
+'        MsgBox Message, vbExclamation, sySystemTitle
+    End If
+    
 End Sub
