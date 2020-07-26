@@ -11,12 +11,12 @@ Option Explicit
 '
 ' 客単価シート作成リクエストから呼び出される。
 ' ----------------------------------------------------------------------------
-Public Function 客単価シートを作成する(wb As Workbook, ByRef MessageDe As String) As Boolean
+Public Function 客単価シートを作成する(wb As Workbook, ByRef メッセージ As String) As Boolean
     
     客単価シートを作成する = True
     
     メインシート以外を削除する
-    客単価シートを作成する = 客単価を計算する(MessageDe)
+    客単価シートを作成する = 客単価を計算する(メッセージ)
 End Function
 
 ' ----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ End Sub
 '
 ' 客単価を計算する。
 ' ----------------------------------------------------------------------------
-Private Function 客単価を計算する(ByRef MessageDe As String) As Boolean
+Private Function 客単価を計算する(ByRef メッセージ As String) As Boolean
     Dim i As Long
     Dim j As Long
     Dim ws As Worksheet
@@ -52,7 +52,7 @@ Private Function 客単価を計算する(ByRef MessageDe As String) As Boolean
     
     最大行数 = ws.Cells(Rows.Count, 1).End(xlUp).Row
     
-    客単価を計算する = me客単価シートを追加する(MessageDe)
+    客単価を計算する = me客単価シートを追加する(メッセージ)
 
     Set ws2 = ThisWorkbook.Worksheets(2)
     
@@ -77,7 +77,7 @@ End Function
 '
 ' 客単価シートを追加する。
 ' ----------------------------------------------------------------------------
-Private Function me客単価シートを追加する(ByRef MessageDe As String) As Boolean
+Private Function me客単価シートを追加する(ByRef メッセージ As String) As Boolean
     Dim ws As Worksheet
     
     me客単価シートを追加する = True
@@ -90,7 +90,7 @@ Private Function me客単価シートを追加する(ByRef MessageDe As String) As Boolean
     
     If ws Is Nothing Then
         me客単価シートを追加する = False
-        MessageDe = "シート" & Gシート名客単価 & "の追加に失敗しました。"
+        メッセージ = "シート" & Gシート名客単価 & "の追加に失敗しました。"
     End If
 
     With ws
