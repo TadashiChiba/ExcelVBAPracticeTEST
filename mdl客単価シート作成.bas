@@ -12,11 +12,11 @@ Option Explicit
 ' 客単価シート作成リクエストから呼び出される。
 ' ----------------------------------------------------------------------------
 Public Function 客単価シートを作成する(wb As Workbook, ByRef MessageDe As String) As Boolean
-    'falseの場合の処理は未実装。
+    
     客単価シートを作成する = True
     
     メインシート以外を削除する
-    客単価を計算する
+    客単価シートを作成する = 客単価を計算する(MessageDe)
 End Function
 
 ' ----------------------------------------------------------------------------
@@ -24,7 +24,7 @@ End Function
 '
 ' メインシート以外を消去する。
 ' ----------------------------------------------------------------------------
-Public Sub メインシート以外を削除する()
+Private Sub メインシート以外を削除する()
     Dim ws As Worksheet
 
     For Each ws In Worksheets
@@ -39,18 +39,20 @@ End Sub
 '
 ' 客単価を計算する。
 ' ----------------------------------------------------------------------------
-Public Sub 客単価を計算する()
+Private Function 客単価を計算する(ByRef MessageDe As String) As Boolean
     Dim i As Long
     Dim j As Long
     Dim ws As Worksheet
     Dim ws2 As Worksheet
     Dim 最大行数 As Long
     
+    客単価を計算する = True
+    
     Set ws = ThisWorkbook.Worksheets(1)
     
     最大行数 = ws.Cells(Rows.Count, 1).End(xlUp).Row
     
-    me客単価シートを追加する
+    客単価を計算する = me客単価シートを追加する(MessageDe)
 
     Set ws2 = ThisWorkbook.Worksheets(2)
     
@@ -68,19 +70,28 @@ Public Sub 客単価を計算する()
     me一つの客単価を計算する ws2, 最大行数
     
     Set ws = Nothing
-End Sub
+End Function
 
 ' ----------------------------------------------------------------------------
 ' me客単価シートを追加する
 '
 ' 客単価シートを追加する。
 ' ----------------------------------------------------------------------------
-Private Sub me客単価シートを追加する()
+Private Function me客単価シートを追加する(ByRef MessageDe As String) As Boolean
     Dim ws As Worksheet
     
+    me客単価シートを追加する = True
+
     Worksheets.Add after:=Worksheets(Worksheets.Count)
     
+    On Error Resume Next
     Set ws = ThisWorkbook.Worksheets(2)
+    On Error GoTo 0
+    
+    If ws Is Nothing Then
+        me客単価シートを追加する = False
+        MessageDe = "シート" & Gシート名客単価 & "の追加に失敗しました。"
+    End If
 
     With ws
         .Name = Gシート名客単価
@@ -91,7 +102,7 @@ Private Sub me客単価シートを追加する()
     End With
     
     Set ws = Nothing
-End Sub
+End Function
 
 ' ----------------------------------------------------------------------------
 ' me一つの客単価を計算する
