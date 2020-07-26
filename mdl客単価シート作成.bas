@@ -86,12 +86,12 @@ Private Function me客単価シートを追加する(ByRef メッセージ As String) As Boolean
     
     On Error Resume Next
     Set ws = ThisWorkbook.Worksheets(2)
-    On Error GoTo 0
     
     If ws Is Nothing Then
         me客単価シートを追加する = False
         メッセージ = "シート" & Gシート名客単価 & "の追加に失敗しました。"
     End If
+    On Error GoTo 0
 
     With ws
         .Name = Gシート名客単価
