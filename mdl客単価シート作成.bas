@@ -39,6 +39,8 @@ Private Function me前処理を行う(wb As Workbook) As Boolean
     If me前処理を行う Then
         me前処理を行う = True
     End If
+    
+    me客単価シートに罫線を引く wb
 End Function
 
 ' ----------------------------------------------------------------------------
@@ -88,6 +90,21 @@ Private Function me客単価シートを追加する(wb As Workbook) As Boolean
 End Function
 
 ' ----------------------------------------------------------------------------
+
+
+' ----------------------------------------------------------------------------
+Private Sub me客単価シートに罫線を引く(wb As Workbook)
+    Dim ws As Worksheet
+    Dim 最大行数 As Long
+    
+    Set ws = wb.Worksheets(2)
+    
+    最大行数 = wb.Worksheets(1).Cells(Rows.Count, 1).End(xlUp).Row
+
+    ws.Range(Cells(1, 1), Cells(最大行数, GC客単価)).Borders.LineStyle = True
+
+End Sub
+' ----------------------------------------------------------------------------
 ' ◆ me客単価シートを作成する
 '
 ' 客単価を計算する。
@@ -112,8 +129,6 @@ Private Sub me客単価シートを作成する(ws As Worksheet, ws2 As Worksheet)
             me一つの客単価を計算する i
         Next
     End With
-    
-    Worksheets(Gシート名客単価).Range("A1").CurrentRegion.Borders.LineStyle = xlContinuous
 End Sub
 
 ' ----------------------------------------------------------------------------
