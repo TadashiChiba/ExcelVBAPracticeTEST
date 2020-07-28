@@ -12,63 +12,50 @@ Option Explicit
 ' 客単価シート作成リクエストから呼び出される。
 ' ----------------------------------------------------------------------------
 Public Function 客単価シートを作成する(wb As Workbook, ByRef メッセージDe As String) As Boolean
-    メインシート以外を削除する
-    客単価シートを作成する = 客単価を計算する(メッセージDe)
+    
+    客単価シートを作成する = me前処理を行う(wb)
     If Not 客単価シートを作成する Then
-        メッセージDe = "メインシートの客数列に空白セルがあるため全ての日付の客単価を計算出来ませんでした。"
+        メッセージDe = "客単価シート作成に失敗しました。"
+        Exit Function
+    End If
+
+    With wb
+        me客単価シートを作成する .Worksheets(Gシート名客単価), .Worksheets(Gシート名メイン)
+        me後処理を行う .Worksheets(Gシート名客単価)
+    End With
+
+End Function
+
+' ----------------------------------------------------------------------------
+' ◆ me前処理を行う
+'
+' 初期化処理(客単価シート削除、新規客単価シート追加)を行う。
+' ----------------------------------------------------------------------------
+Private Function me前処理を行う(wb As Workbook) As Boolean
+
+    me客単価シートを削除する wb
+    
+    me前処理を行う = me客単価シートを追加する(wb)
+    If me前処理を行う Then
+        me前処理を行う = True
     End If
 End Function
 
 ' ----------------------------------------------------------------------------
-' ◆ メインシート以外を削除する
+' ◆ me客単価シートを削除する
 '
-' メインシート以外を消去する。
+' 客単価シートが既に存在していたら削除する
 ' ----------------------------------------------------------------------------
-Private Sub メインシート以外を削除する()
+Private Function me客単価シートを削除する(wb As Workbook)
     Dim ws As Worksheet
-
-    For Each ws In Worksheets
-        If ws.Name <> Gシート名メイン Then
-            ws.Delete
-        End If
-    Next
-End Sub
-
-' ----------------------------------------------------------------------------
-' ◆ 客単価を計算する
-'
-' 客単価を計算する。
-' ----------------------------------------------------------------------------
-Private Function 客単価を計算する(ByRef メッセージDe As String) As Boolean
-    Dim i As Long
-    Dim j As Long
-    Dim ws As Worksheet
-    Dim ws2 As Worksheet
-    Dim 最大行数 As Long
-    Dim エラー発生行数De As Long
     
-    Set ws = ThisWorkbook.Worksheets(1)
+    On Error Resume Next
+    Set ws = wb.Worksheets(2)
+    On Error GoTo 0
     
-    最大行数 = ws.Cells(Rows.Count, 1).End(xlUp).Row
-    
-    me客単価シートを追加する (メッセージDe)
-
-    Set ws2 = ThisWorkbook.Worksheets(2)
-    
-    With ws2
-        For i = 2 To 最大行数
-            For j = 1 To GC客単価 - 1
-                .Cells(i, j).Value = ws.Cells(i, j).Value
-                .Cells(i, j).EntireColumn.AutoFit
-            Next
-        Next
-    End With
-    
-    Worksheets(Gシート名客単価).Range("A1").CurrentRegion.Borders.LineStyle = xlContinuous
-
-    客単価を計算する = me一つの客単価を計算する(ws2, 最大行数, メッセージDe)
-   
-    Set ws = Nothing
+    If Not ws Is Nothing Then
+        ws.Delete
+    End If
 End Function
 
 ' ----------------------------------------------------------------------------
@@ -76,12 +63,19 @@ End Function
 '
 ' 客単価シートを追加する。
 ' ----------------------------------------------------------------------------
-Private Function me客単価シートを追加する(ByRef メッセージDe As String) As Boolean
+Private Function me客単価シートを追加する(wb As Workbook) As Boolean
     Dim ws As Worksheet
+
+    wb.Worksheets.Add after:=Worksheets(Worksheets.Count)
     
-    Worksheets.Add after:=Worksheets(Worksheets.Count)
-    Set ws = ThisWorkbook.Worksheets(2)
+    On Error Resume Next
+    Set ws = wb.Worksheets(2)
     
+    If Not ws Is Nothing Then
+        me客単価シートを追加する = True
+    End If
+    On Error GoTo 0
+
     With ws
         .Name = Gシート名客単価
         .Range("A1").Value = "日付"
@@ -94,25 +88,54 @@ Private Function me客単価シートを追加する(ByRef メッセージDe As String) As Boole
 End Function
 
 ' ----------------------------------------------------------------------------
-' me一つの客単価を計算する
+' ◆ me客単価シートを作成する
 '
-' 客単価 = 売上 ÷ 客数。メインシートの客数列に空白セルがあり0での除算が発生してもその行は無視してエラーメッセージを表示する。
+' 客単価を計算する。
 ' ----------------------------------------------------------------------------
-Private Function me一つの客単価を計算する(ws As Worksheet, 最大行数 As Long, ByRef メッセージDe As String) As Boolean
+Private Sub me客単価シートを作成する(ws As Worksheet, ws2 As Worksheet)
     Dim i As Long
     Dim j As Long
+    Dim 最大行数 As Long
+
+    最大行数 = ws2.Cells(Rows.Count, 1).End(xlUp).Row
     
-    me一つの客単価を計算する = True
-    
-    On Error Resume Next
     With ws
         For i = 2 To 最大行数
-            .Cells(i, GC客単価).Value = .Cells(i, GC売上) \ .Cells(i, GC客数)
-            If Err.Number <> 0 Then
-                me一つの客単価を計算する = False
-            End If
+            For j = 1 To GC客単価 - 1
+                .Cells(i, j).Value = ws2.Cells(i, j).Value
+            Next
         Next
     End With
     
-    On Error GoTo 0
-End Function
+    With ws
+        For i = 2 To 最大行数
+            me一つの客単価を計算する i
+        Next
+    End With
+    
+    Worksheets(Gシート名客単価).Range("A1").CurrentRegion.Borders.LineStyle = xlContinuous
+End Sub
+
+' ----------------------------------------------------------------------------
+' me一つの客単価を計算する
+'
+
+' 客単価 = 売上 ÷ 客数。
+' ----------------------------------------------------------------------------
+Private Sub me一つの客単価を計算する(対象行数)
+    Dim ws As Worksheet
+    
+    Set ws = ThisWorkbook.Worksheets(2)
+    With ws
+        .Cells(対象行数, GC客単価).Value = .Cells(対象行数, GC売上) \ .Cells(対象行数, GC客数)
+    End With
+End Sub
+
+' ----------------------------------------------------------------------------
+' me後処理を行う
+'
+' 客単価シートの成形を行う
+' ----------------------------------------------------------------------------
+Private Sub me後処理を行う(ws As Worksheet)
+   ws.Range("A:D").EntireColumn.AutoFit
+End Sub
